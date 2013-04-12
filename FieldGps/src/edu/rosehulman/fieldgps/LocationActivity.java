@@ -81,7 +81,7 @@ public class LocationActivity extends Activity implements FieldGpsListener {
     mGpsLocationTextView.setText(
         String.format("%.6f,%.6f", location.getLatitude(), location.getLongitude())); 
     if (location.hasAccuracy()) {
-      mGpsAccuracyTextView.setText(String.format("%.1f ft", location.getAccuracy()));          
+      mGpsAccuracyTextView.setText(String.format("%.1f ft", location.getAccuracy() * FieldGps.FEET_PER_METER));          
     } else {
       mGpsAccuracyTextView.setText("---");    
     }
