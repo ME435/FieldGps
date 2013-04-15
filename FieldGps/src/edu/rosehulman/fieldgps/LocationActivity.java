@@ -1,8 +1,10 @@
 package edu.rosehulman.fieldgps;
 
 import android.app.Activity;
+import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -25,10 +27,17 @@ public class LocationActivity extends Activity implements FieldGpsListener {
   /** Counter for the number of updates received. */
   private long mUpdatesCounter = 0;
 
+  /** Force the screen and CPU to high power mode always. */
+  private PowerManager.WakeLock mWakeLock;
+  
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_location);
+    
+    PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+    mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "Unused TAG");
+    
     mXTextView = (TextView) findViewById(R.id.x_textview);
     mYTextView = (TextView) findViewById(R.id.y_textview);
     mBearingTextView = (TextView) findViewById(R.id.bearing_textview);
@@ -55,6 +64,7 @@ public class LocationActivity extends Activity implements FieldGpsListener {
   @Override
   protected void onStart() {
     super.onStart();
+    mWakeLock.acquire();
     mFieldGps.requestLocationUpdates(this); // Start receiving GPS Provider updates.
     mXTextView.setText("Waiting for first fix");
     mYTextView.setText("Waiting for first fix");
@@ -64,6 +74,7 @@ public class LocationActivity extends Activity implements FieldGpsListener {
   @Override
   protected void onStop() {
     super.onStop();
+    mWakeLock.release();
     mFieldGps.removeUpdates(); // Stop receiving GPS Provider updates.
   }
 
